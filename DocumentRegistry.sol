@@ -1,10 +1,6 @@
 pragma solidity ^0.5.6;
 
 
-/**
- * @title A registry of document protocols, and theirs revisions, on the Ethereum Blockchain
- * @author Alessandro Fraschetti
- */
 contract DocumentRegistry
 {
     string constant private version = "0.0.1";
@@ -17,6 +13,7 @@ contract DocumentRegistry
         bytes32 revisionOfProtocol; //hash documento revisionato
         uint revisionNumber;
         bytes32 revisionedByProtocol; //hash documento precedente revisione
+        string jsonMetadata;
     }
     mapping(bytes32 => Document) internal registry;
 
@@ -49,7 +46,7 @@ contract DocumentRegistry
      *         Emit an event Registered in case of success
      * @param _protocol the document protocol
      */
-    function registerDocument(bytes32 _protocol)
+    function registerDocument(bytes32 _protocol, string calldata _metadata)
     external
     {
         uint date = now;
@@ -61,6 +58,7 @@ contract DocumentRegistry
         registry[_protocol].revisionOfProtocol = _protocol;
         registry[_protocol].revisionNumber = 1;
         registry[_protocol].revisionedByProtocol = _protocol;
+        registry[_protocol].jsonMetadata = _metadata;
         emit Registered(msg.sender, _protocol, date);
          }
          else {
@@ -85,6 +83,7 @@ contract DocumentRegistry
             registry[_protocol].revisionOfProtocol = _revisionOfProtocol;
             registry[_protocol].revisionNumber = registry[_revisionOfProtocol].revisionNumber + 1;
             registry[_protocol].revisionedByProtocol = _protocol;
+            registry[_protocol].jsonMetadata = registry[_revisionOfProtocol].jsonMetadata;
             emit Registered(msg.sender, _protocol, date);
 
             registry[_revisionOfProtocol].revisionedByProtocol = _protocol;
